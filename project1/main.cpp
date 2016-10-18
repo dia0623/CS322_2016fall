@@ -98,7 +98,6 @@ void readText(string filename){
     //read states
     mealy>>state;
     mealy>>state;
-    
     i = 0;
     j = 0;
     while(j < state.size()){
@@ -212,6 +211,8 @@ int jong_to_cho(int jong){
     switch(jong){
         case 1 :
             return 0;
+        case 2 :
+            return 1;
         case 4 :
             return 2;
         case 7 :
@@ -224,6 +225,8 @@ int jong_to_cho(int jong){
             return 7;
         case 19 :
             return 9;
+        case 20 :
+            return 10;
         case 21 :
             return 11;
         case 22 :

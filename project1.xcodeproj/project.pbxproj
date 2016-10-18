@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		392688191DAC9DC3009A6137 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 392688181DAC9DC3009A6137 /* main.cpp */; };
+		392BB90A1DB636FB00739610 /* mealy.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 392BB9091DB636FB00739610 /* mealy.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -20,6 +21,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
+		392BB9081DB636C600739610 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 16;
+			files = (
+				392BB90A1DB636FB00739610 /* mealy.txt in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +39,7 @@
 		3926881F1DACA639009A6137 /* linux_kbhit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = linux_kbhit.h; sourceTree = "<group>"; };
 		392BB8F21DAE72D200739610 /* mealy.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = mealy.txt; sourceTree = "<group>"; };
 		392BB8F31DAE8B7600739610 /* mealy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mealy.cpp; path = "../../../[예비프로젝트1-2]/[예비프로젝트1-2]/mealy.cpp"; sourceTree = "<group>"; };
+		392BB9091DB636FB00739610 /* mealy.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = mealy.txt; path = project1/mealy.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -44,6 +56,7 @@
 		3926880C1DAC9DC2009A6137 = {
 			isa = PBXGroup;
 			children = (
+				392BB9091DB636FB00739610 /* mealy.txt */,
 				392688171DAC9DC3009A6137 /* project1 */,
 				392688161DAC9DC3009A6137 /* Products */,
 			);
@@ -62,8 +75,8 @@
 			children = (
 				392688181DAC9DC3009A6137 /* main.cpp */,
 				392BB8F31DAE8B7600739610 /* mealy.cpp */,
-				3926881F1DACA639009A6137 /* linux_kbhit.h */,
 				392BB8F21DAE72D200739610 /* mealy.txt */,
+				3926881F1DACA639009A6137 /* linux_kbhit.h */,
 			);
 			path = project1;
 			sourceTree = "<group>";
@@ -78,6 +91,7 @@
 				392688111DAC9DC2009A6137 /* Sources */,
 				392688121DAC9DC2009A6137 /* Frameworks */,
 				392688131DAC9DC2009A6137 /* CopyFiles */,
+				392BB9081DB636C600739610 /* CopyFiles */,
 			);
 			buildRules = (
 			);
