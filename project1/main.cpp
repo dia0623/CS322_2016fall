@@ -87,6 +87,7 @@ int getch(void)
     return ch;
 }
 
+// read the given hangeul dfa
 void readText(string filename){
     ifstream mealy;
     string state, symbol, func, ini;
@@ -187,6 +188,7 @@ void readText(string filename){
     mealy >> ini;
 }
 
+// given chosung, jungsung and jongsung, get the actual hangeul character in Unicode
 wchar_t mk_han(vector<int> current_word, int cho_ind, int jung_ind, int jong_ind){
     int sum = current_word.at(cho_ind) * 21 * 28;
     if (jung_ind != 0) sum += current_word.at(jung_ind) * 28;
@@ -198,12 +200,14 @@ wchar_t mk_han(vector<int> current_word, int cho_ind, int jung_ind, int jong_ind
     return (wchar_t)sum;
 }
 
+// convert 0~9, A~R to 0~27
 int string_conversion(char num){
     if (num >= '0' && num <= '9') return num - '0';
     if (num >= 'A' && num <= 'R') return num - 'A' + 10;
     return -1;
 }
 
+// match jongsung unicode to chosung unicode
 int jong_to_cho(int jong){
     switch(jong){
         case 1 :
@@ -239,6 +243,7 @@ int jong_to_cho(int jong){
     }
 }
 
+// match double jongsung unicode to single jongsung unicode
 int jong_to_single(int jong){
     switch(jong){
         case 3 :
@@ -268,6 +273,7 @@ int jong_to_single(int jong){
     }
 }
 
+// match double jongsung unicode to chosung unicode
 int jong_to_cho2(int jong){
     switch(jong){
         case 3 :
@@ -297,6 +303,7 @@ int jong_to_cho2(int jong){
     }
 }
 
+// append wchar_t to wchar_t*
 wchar_t* appendwChar(wchar_t* array, wchar_t a)
 {
     size_t len = wcslen(array);
@@ -310,6 +317,7 @@ wchar_t* appendwChar(wchar_t* array, wchar_t a)
     return ret;
 }
 
+// remove last wchar_t in wchar_t*
 void removeLast(wchar_t* array)
 {
     array[wcslen(array) - 1] = '\0';
@@ -319,13 +327,13 @@ int main(void){
     setlocale(LC_ALL, "ko_KR.UTF-8");
     
     string current_state = "S", next_state;
-    wstring word;
+    //wstring word;
     wchar_t* w = L"";
     vector<int> current_word;
     int cho_ind = 0, jung_ind = 0, jong_ind = 0;
     wchar_t temp;
     
-    readText("mealy.txt");
+    readText("mealy.txt"); //information about hangeul dfa
     
     printf("Type 1 for 받침우선, Type 2 for 초성우선 : ");
     char type = linux_kbhit();
@@ -343,9 +351,9 @@ int main(void){
             {
                 if (value == '<'){
                     //eraser
-                    if (current_word.size() == 0 && wcslen(w) != 0) removeLast(w);
+                    if (current_word.size() == 0 && wcslen(w) != 0) removeLast(w); // no current word
                     else{
-                        if (jong_ind == jung_ind + 2){
+                        if (jong_ind == jung_ind + 2){ //겹받침
                             if (current_word.at(jong_ind - 1) == 1)
                                 current_state = "K";
                             else if (current_word.at(jong_ind - 1) == 4)
@@ -357,7 +365,7 @@ int main(void){
                             
                             jong_ind --;
                         }
-                        else if (jong_ind == jung_ind + 1){
+                        else if (jong_ind == jung_ind + 1){ //홀받침
                             if (jung_ind == cho_ind + 2)
                                 current_state = "I";
                             else if (jung_ind == cho_ind + 1){
@@ -372,7 +380,7 @@ int main(void){
                             }
                             jong_ind = 0;
                         }
-                        else if (jung_ind == cho_ind + 2){
+                        else if (jung_ind == cho_ind + 2){ //겹모음
                             if (current_word.at(jung_ind - 1) == 8)
                                 current_state = "O";
                             else if (current_word.at(jung_ind - 1) == 13)
@@ -381,7 +389,7 @@ int main(void){
                                 current_state = "A";
                             jung_ind --;
                         }
-                        else if (jung_ind == cho_ind + 1){
+                        else if (jung_ind == cho_ind + 1){ //홀모음
                             current_state = "V";
                             jung_ind = 0;
                         }
@@ -390,7 +398,7 @@ int main(void){
                         }
                         current_word.pop_back();
                     }
-                    if (current_word.size() != 0){
+                    if (current_word.size() != 0){ //초성
                         temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
                         w = appendwChar(w, temp);
                         wprintf(L"%ls\n", w);
@@ -400,13 +408,13 @@ int main(void){
                         wprintf(L"%ls\n", w);
                     continue;
                 }
-                //printf("%c\n", value);
-                f(current_state, value);
-                next_state = input_table.at(index_i).at(index_j);
-                string sym = output_table.at(index_i).at(index_j);
                 
-                if(!next_state.compare("V")){
-                    if(current_state.compare("S")) //word += mk_han(current_word, cho_ind, jung_ind, jong_ind);
+                f(current_state, value); // current state, input symbol => next state
+                next_state = input_table.at(index_i).at(index_j); // next state
+                string sym = output_table.at(index_i).at(index_j); // output symbol
+                
+                if(!next_state.compare("V")){ // chosung
+                    if(current_state.compare("S")) // start of the program
                         w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind));
                     current_word.clear();
                     cho_ind = 0;
@@ -415,23 +423,16 @@ int main(void){
                     
                     current_word.push_back(string_conversion(sym.at(0)));
                     
-                    //cout<<sym.at(0)<<endl;
-                    //cout<<string_conversion(sym.at(0))<<endl;
                     
-                    //cout<<mk_han(current_word, cho_ind, jung_ind, jong_ind)<<endl;
-                    //wprintf(L"%lc\n", mk_han(current_word, cho_ind, jung_ind, jong_ind));
+                    temp = mk_han(current_word, cho_ind, jung_ind, jong_ind); // last character
                     
-                    temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
-                    /*word += temp;
-                    wprintf(L"%ls\n", &word);
-                    word.pop_back();*/
+                    //print and erase
                     w = appendwChar(w, temp);
                     wprintf(L"%ls\n", w);
                     removeLast(w);
                 }
-                else if(!next_state.compare("O") || !next_state.compare("U") || !next_state.compare("A")){
+                else if(!next_state.compare("O") || !next_state.compare("U") || !next_state.compare("A")){ //홑모음
                     if(!current_state.compare("K") || !current_state.compare("B") || !current_state.compare("N") || !current_state.compare("R")){
-                        //word += mk_han(current_word, cho_ind, jung_ind, 0);
                         w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, 0));
                         int t = current_word.at(jong_ind);
                         current_word.clear();
@@ -441,7 +442,6 @@ int main(void){
                     }
                     else if (!current_state.compare("L")){
                         if (jong_ind == jung_ind + 2){
-                            //word += mk_han(current_word, cho_ind, jung_ind, jung_ind + 1);
                             w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jung_ind + 1));
                             int t = current_word.at(jong_ind);
                             current_word.clear();
@@ -450,7 +450,6 @@ int main(void){
                             cho_ind = 0; jung_ind = 0; jong_ind = 0;
                         }
                         else{
-                            //word += mk_han(current_word, cho_ind, jung_ind, 0);
                             w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, 0));
                             int t = current_word.at(jong_ind);
                             current_word.clear();
@@ -465,9 +464,6 @@ int main(void){
                     
                     temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
                     
-                    /*word += temp;
-                    wprintf(L"%ls\n", &word);
-                    word.pop_back();*/
                     w = appendwChar(w, temp);
                     wprintf(L"%ls\n", w);
                     removeLast(w);
@@ -478,7 +474,6 @@ int main(void){
                     else if (!current_state.compare("V"))
                         jung_ind = cho_ind + 1;
                     else if(!current_state.compare("K") || !current_state.compare("B") || !current_state.compare("N") || !current_state.compare("R")){
-                        //word += mk_han(current_word, cho_ind, jung_ind, 0);
                         w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, 0));
                         int t = current_word.at(jong_ind);
                         current_word.clear();
@@ -488,7 +483,6 @@ int main(void){
                     }
                     else if (!current_state.compare("L")){
                         if (jong_ind == jung_ind + 2){
-                            //word += mk_han(current_word, cho_ind, jung_ind, jung_ind + 1);
                             w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jung_ind + 1));
                             int t = current_word.at(jong_ind);
                             current_word.clear();
@@ -497,7 +491,6 @@ int main(void){
                             cho_ind = 0; jung_ind = 1; jong_ind = 0;
                         }
                         else{
-                            //word += mk_han(current_word, cho_ind, jung_ind, 0);
                             w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, 0));
                             int t = current_word.at(jong_ind);
                             current_word.clear();
@@ -510,11 +503,7 @@ int main(void){
                     current_word.push_back(string_conversion(sym.at(0)));
                     
                     temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
-                    //wprintf(L"%lc\n", temp);
-                    
-                    /*word += temp;
-                    wprintf(L"%ls\n", &word);
-                    word.pop_back();*/
+
                     w = appendwChar(w, temp);
                     wprintf(L"%ls\n", w);
                     removeLast(w);
@@ -524,9 +513,7 @@ int main(void){
                     current_word.push_back(string_conversion(sym.at(0)));
                     
                     temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
-                    /*word += temp;
-                    wprintf(L"%ls\n", &word);
-                    word.pop_back();*/
+
                     w = appendwChar(w, temp);
                     wprintf(L"%ls\n", w);
                     removeLast(w);
@@ -540,25 +527,13 @@ int main(void){
                     current_word.push_back(string_conversion(sym.at(0)));
                     
                     temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
-                    /*word += temp;
-                    wprintf(L"%ls\n", &word);
-                    word.pop_back();*/
+
                     w = appendwChar(w, temp);
                     wprintf(L"%ls\n", w);
                     removeLast(w);
                 }
                 current_state = next_state;
             }
-            
-            /*char value = getch();
-            printf("%c\n", value);*/
-            
-            if(value == '.') break;
-            //wprintf(L"%lc\n", word[word.size() - 1]);
-            //cout << word.size() << endl;
-            //cout << "cho " << cho_ind << " " << current_word.at(cho_ind) << endl;
-            //cout << "jung " << jung_ind << " " << current_word.at(jung_ind) << endl;
-            //cout << "jong " << jong_ind << " " << current_word.at(jong_ind) << endl;
         }
     }
     
@@ -573,7 +548,7 @@ int main(void){
             if (value != -1)
             {
                 if (value == '<'){
-                    //eraser
+                    //eraser same as 받침우선
                     if (current_word.size() == 0 && wcslen(w) != 0) removeLast(w);
                     else{
                         if (jong_ind == jung_ind + 2){
@@ -637,7 +612,7 @@ int main(void){
                 string sym = output_table.at(index_i).at(index_j);
                 
                 if(!next_state.compare("V")){
-                    if(current_state.compare("S")) //word += mk_han(current_word, cho_ind, jung_ind, jong_ind);
+                    if(current_state.compare("S"))
                         w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind));
                     current_word.clear();
                     cho_ind = 0;
@@ -646,23 +621,14 @@ int main(void){
                     
                     current_word.push_back(string_conversion(sym.at(0)));
                     
-                    //cout<<sym.at(0)<<endl;
-                    //cout<<string_conversion(sym.at(0))<<endl;
-                    
-                    //cout<<mk_han(current_word, cho_ind, jung_ind, jong_ind)<<endl;
-                    //wprintf(L"%lc\n", mk_han(current_word, cho_ind, jung_ind, jong_ind));
-                    
                     temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
-                    /*word += temp;
-                     wprintf(L"%ls\n", &word);
-                     word.pop_back();*/
+                    
                     w = appendwChar(w, temp);
                     wprintf(L"%ls\n", w);
                     removeLast(w);
                 }
                 else if(!next_state.compare("O") || !next_state.compare("U") || !next_state.compare("A")){
                     if(!current_state.compare("K") || !current_state.compare("B") || !current_state.compare("N") || !current_state.compare("R")){
-                        //word += mk_han(current_word, cho_ind, jung_ind, 0);
                         w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, 0));
                         int t = current_word.at(jong_ind);
                         current_word.clear();
@@ -672,7 +638,6 @@ int main(void){
                     }
                     else if (!current_state.compare("L")){
                         if (jong_ind == jung_ind + 2){
-                            //word += mk_han(current_word, cho_ind, jung_ind, jung_ind + 1);
                             w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jung_ind + 1));
                             int t = current_word.at(jong_ind);
                             current_word.clear();
@@ -681,7 +646,6 @@ int main(void){
                             cho_ind = 0; jung_ind = 0; jong_ind = 0;
                         }
                         else{
-                            //word += mk_han(current_word, cho_ind, jung_ind, 0);
                             w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, 0));
                             int t = current_word.at(jong_ind);
                             current_word.clear();
@@ -696,9 +660,6 @@ int main(void){
                     
                     temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
                     
-                    /*word += temp;
-                     wprintf(L"%ls\n", &word);
-                     word.pop_back();*/
                     w = appendwChar(w, temp);
                     wprintf(L"%ls\n", w);
                     removeLast(w);
@@ -709,7 +670,6 @@ int main(void){
                     else if (!current_state.compare("V"))
                         jung_ind = cho_ind + 1;
                     else if(!current_state.compare("K") || !current_state.compare("B") || !current_state.compare("N") || !current_state.compare("R")){
-                        //word += mk_han(current_word, cho_ind, jung_ind, 0);
                         w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, 0));
                         int t = current_word.at(jong_ind);
                         current_word.clear();
@@ -719,7 +679,6 @@ int main(void){
                     }
                     else if (!current_state.compare("L")){
                         if (jong_ind == jung_ind + 2){
-                            //word += mk_han(current_word, cho_ind, jung_ind, jung_ind + 1);
                             w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jung_ind + 1));
                             int t = current_word.at(jong_ind);
                             current_word.clear();
@@ -728,7 +687,6 @@ int main(void){
                             cho_ind = 0; jung_ind = 1; jong_ind = 0;
                         }
                         else{
-                            //word += mk_han(current_word, cho_ind, jung_ind, 0);
                             w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, 0));
                             int t = current_word.at(jong_ind);
                             current_word.clear();
@@ -741,11 +699,7 @@ int main(void){
                     current_word.push_back(string_conversion(sym.at(0)));
                     
                     temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
-                    //wprintf(L"%lc\n", temp);
-                    
-                    /*word += temp;
-                     wprintf(L"%ls\n", &word);
-                     word.pop_back();*/
+
                     w = appendwChar(w, temp);
                     wprintf(L"%ls\n", w);
                     removeLast(w);
@@ -755,9 +709,7 @@ int main(void){
                     current_word.push_back(string_conversion(sym.at(0)));
                     
                     temp = mk_han(current_word, cho_ind, jung_ind, 0);
-                    /*word += temp;
-                     wprintf(L"%ls\n", &word);
-                     word.pop_back();*/
+
                     w = appendwChar(w, temp);
                     w = appendwChar(w, 0x1100 + jong_to_cho(current_word.at(jong_ind)));
                     wprintf(L"%ls\n", w);
@@ -781,9 +733,7 @@ int main(void){
                         current_word.push_back(string_conversion(sym.at(0)));
                         
                         temp = mk_han(current_word, cho_ind, jung_ind, 0);
-                        /*word += temp;
-                         wprintf(L"%ls\n", &word);
-                         word.pop_back();*/
+
                         w = appendwChar(w, temp);
                         w = appendwChar(w, 0x1100 + jong_to_cho(current_word.at(jong_ind)));
                         wprintf(L"%ls\n", w);
@@ -793,21 +743,11 @@ int main(void){
                 }
                 current_state = next_state;
             }
-            
-            /*char value = getch();
-             printf("%c\n", value);*/
-            
-            if(value == '.') break;
-            //wprintf(L"%lc\n", word[word.size() - 1]);
-            //cout << word.size() << endl;
-            //cout << "cho " << cho_ind << " " << current_word.at(cho_ind) << endl;
-            //cout << "jung " << jung_ind << " " << current_word.at(jung_ind) << endl;
-            //cout << "jong " << jong_ind << " " << current_word.at(jong_ind) << endl;
         }
     }
     
     printf("\n");
-    printf("<Esc> key pressed. Bye bye\n\n");
+    printf("Bye bye\n\n");
     
     return 0;
 }
