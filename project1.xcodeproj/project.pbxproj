@@ -24,7 +24,10 @@
 
 /* Begin PBXFileReference section */
 		392688151DAC9DC3009A6137 /* project1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = project1; sourceTree = BUILT_PRODUCTS_DIR; };
-		392688181DAC9DC3009A6137 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		392688181DAC9DC3009A6137 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		3926881F1DACA639009A6137 /* linux_kbhit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = linux_kbhit.h; sourceTree = "<group>"; };
+		392BB8F21DAE72D200739610 /* mealy.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = mealy.txt; sourceTree = "<group>"; };
+		392BB8F31DAE8B7600739610 /* mealy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mealy.cpp; path = "../../../[예비프로젝트1-2]/[예비프로젝트1-2]/mealy.cpp"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +61,9 @@
 			isa = PBXGroup;
 			children = (
 				392688181DAC9DC3009A6137 /* main.cpp */,
+				392BB8F31DAE8B7600739610 /* mealy.cpp */,
+				3926881F1DACA639009A6137 /* linux_kbhit.h */,
+				392BB8F21DAE72D200739610 /* mealy.txt */,
 			);
 			path = project1;
 			sourceTree = "<group>";
@@ -246,6 +252,7 @@
 				3926881E1DAC9DC3009A6137 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
