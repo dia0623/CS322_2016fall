@@ -1,0 +1,10 @@
+State
+0,1
+Input symbol
+
+State transition function
+0,E,1
+Initial state
+0
+Final state
+1

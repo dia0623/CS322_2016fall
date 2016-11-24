@@ -1,0 +1,13 @@
+State
+abc,def,ghi,xyz
+Input symbol
+a,b
+State transition function
+abc,a,abc
+abc,E,ghi
+ghi,b,def
+def,b,xyz
+Initial state
+abc
+Final state
+def

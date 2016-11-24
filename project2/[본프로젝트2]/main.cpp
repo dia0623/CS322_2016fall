@@ -138,17 +138,25 @@ void readText(string filename){
     nfa>>symbol;
     nfa>>symbol;
     i = 0;
-    while(i < symbol.size()){
-        if (i % 2 == 0)
-            symbols.push_back(symbol.at(i));
-        i ++;
+    if (symbol.compare("State")){
+        while(i < symbol.size()){
+            if (i % 2 == 0)
+                symbols.push_back(symbol.at(i));
+            i ++;
+        }
+        nfa >> func;
+        nfa >> func;
+        nfa >> func;
+    }
+    else{
+        nfa >> func;
+        nfa >> func;
     }
     symbols.push_back('E');
     
     //read state transition function
     table.assign(states.size(), vector< vector<string> >(symbols.size()));
     
-    nfa >> func; nfa >> func; nfa >> func;
     while(true){
         nfa>>func;
         if (func == "Initial") break;
@@ -471,6 +479,7 @@ int main() {
     mdfa << endl;
     
     mdfa << "State transition function" << endl;
+    int cnt1 = 0;
     for (it = P.begin(); it != P.end(); it ++){
         char curr_state = (*it).at(0);
         
@@ -486,6 +495,7 @@ int main() {
                         //find where (*k) is contained
                         char next_state = find(P, (*k));
                         mdfa << next_state << endl;
+                        cnt1 ++;
                     }
                     ind ++;
                 }
@@ -493,6 +503,7 @@ int main() {
             }
         }
     }
+    if (cnt1 == 0) mdfa << endl;
     
     mdfa << "Initial state" << endl;
     for (it = P.begin(); it != P.end(); it ++){
@@ -508,6 +519,7 @@ int main() {
     
     mdfa << "Final state" << endl;
     int cnt = 0;
+    cnt1 = 0;
     for (it = P.begin(); it != P.end(); it ++){
         vector<char>::iterator k, l;
         for (k = it->begin(); k != it->end(); k ++){
@@ -516,6 +528,7 @@ int main() {
                     if (cnt != 0)
                         mdfa << ",";
                     mdfa << (*it).at(0);
+                    cnt1 ++;
                     cnt ++;
                     break;
                 }
@@ -523,6 +536,7 @@ int main() {
             if (l != dfa_final.end()) break;
         }
     }
+    if (cnt1 == 0) mdfa << 'A';
     mdfa << endl;
     
     /*vector< vector<char> >::iterator it11;

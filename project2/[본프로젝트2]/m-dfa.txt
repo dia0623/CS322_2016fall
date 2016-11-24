@@ -1,0 +1,14 @@
+State
+C,D,B,A
+Input Symbol
+a,b
+State transition function
+C,a,C
+C,b,D
+B,a,C
+B,b,D
+A,b,B
+Initial state
+A
+Final state
+C,D
