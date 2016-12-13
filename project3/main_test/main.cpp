@@ -380,6 +380,7 @@ int main(void){
                                 else if (current_word.at(jong_ind) == 8)
                                     current_state = "R";
                             }
+                            temp_word.clear();
                         }
                         else if (jong_ind == jung_ind + 2){ //겹받침+쌍자음
                             if (current_word.at(jong_ind - 1) == 1) //ㄱ
@@ -394,6 +395,7 @@ int main(void){
                                 current_state = "S1";
                             
                             jong_ind --;
+                            current_word.pop_back();
                         }
                         else if (jong_ind == jung_ind + 1){ //홀받침
                             int mo = current_word.at(jung_ind);
@@ -464,6 +466,7 @@ int main(void){
                                     break;
                             }
                             jong_ind = 0;
+                            current_word.pop_back();
                         }
                         else if (jung_ind == cho_ind + 3){ //3중 모음
                             if(current_word.at(jung_ind) == 10)
@@ -472,6 +475,7 @@ int main(void){
                                 current_state = "OE";
                             
                             jung_ind --;
+                            current_word.pop_back();
                         }
                         else if (jung_ind == cho_ind + 2){ //겹모음
                             int mo = current_word.at(jung_ind);
@@ -507,6 +511,7 @@ int main(void){
                             }
                             
                             jung_ind --;
+                            current_word.pop_back();
                         }
                         else if (jung_ind == cho_ind + 1){ //홀모음
                             int cho = current_word.at(cho_ind);
@@ -572,6 +577,7 @@ int main(void){
                             }
                             
                             jung_ind = 0;
+                            current_word.pop_back();
                         }
                         else if(cho_ind == 1){
                             int cho = current_word.at(0);
@@ -582,8 +588,14 @@ int main(void){
                                 case 2:
                                     current_state = "N";
                                     break;
+                                case 3:
+                                    current_state = "D";
+                                    break;
                                 case 6:
                                     current_state = "M";
+                                    break;
+                                case 7:
+                                    current_state = "B";
                                     break;
                                 case 9:
                                     current_state = "S";
@@ -591,14 +603,19 @@ int main(void){
                                 case 11:
                                     current_state = "O";
                                     break;
+                                case 12:
+                                    current_state = "G";
+                                    break;
                             }
                             
                             cho_ind --;
+                            current_word.pop_back();
                         }
                         else{
                             current_state = "ST";
+                            current_word.pop_back();
                         }
-                        current_word.pop_back();
+                        
                     }
                     if (current_word.size() != 0){ //초성
                         temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
@@ -614,10 +631,6 @@ int main(void){
                 f(current_state, value); // current state, input symbol => next state
                 next_state = input_table.at(index_i).at(index_j); // next state
                 string sym = output_table.at(index_i).at(index_j); // output symbol
-                
-                cout << "curr: " << current_state << endl;
-                cout << "next: " << next_state << endl;
-                cout << sym << endl;
                 
                 if(!next_state.compare("K") || !next_state.compare("N") || !next_state.compare("M") || !next_state.compare("S") || !next_state.compare("O")){ // chosung
                     if(current_state.compare("ST")) // start of the program
@@ -658,7 +671,22 @@ int main(void){
                     removeLast(w);
                 }
                 else if(!next_state.compare("L")){
-                    current_word.pop_back();
+                    if(!current_state.compare("K1") || !current_state.compare("N1") || !current_state.compare("R") || !current_state.compare("M1")
+                       || !current_state.compare("S1") || !current_state.compare("O1")
+                       || !current_state.compare("RK") || !current_state.compare("D1") || !current_state.compare("B1") || !current_state.compare("G1")
+                       || !current_state.compare("RD") || !current_state.compare("RB") || !current_state.compare("KS")
+                       || !current_state.compare("BS")){
+                        w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind));
+                        current_word.clear();
+                        cho_ind = 0; jung_ind = 0; jong_ind = 0;
+                    }
+                    else if(!current_state.compare("NG")){
+                        w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind - 1));
+                        current_word.clear();
+                        cho_ind = 0; jung_ind = 0; jong_ind = 0;
+                    }
+                    else if (current_word.size() != 0)
+                        current_word.pop_back();
                     current_word.push_back(string_conversion(sym.at(0)));
                     
                     temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
@@ -668,17 +696,53 @@ int main(void){
                     removeLast(w);
                 }
                 else if(!next_state.compare("LL")){
-                    if(!current_state.compare("RK") || !current_state.compare("D1") || !current_state.compare("B1") || !current_state.compare("G1")
-                       || !current_state.compare("RD") || !current_state.compare("RB") || !current_state.compare("KS") || !current_state.compare("NG")
-                       || !current_state.compare("BS")){
+                    if(!current_state.compare("RK")){
                         w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind - 1));
                         current_word.clear();
-                        cho_ind = 0; jung_ind = 0; jong_ind = 0;
+                        current_word.push_back(0); //ㄱ
+                        cho_ind = 1; jung_ind = 0; jong_ind = 0;
                     }
-                    else if(!current_state.compare("NS") || !current_state.compare("RS")){
+                    else if(!current_state.compare("D1")){
+                        w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, 0));
+                        current_word.clear();
+                        current_word.push_back(3); //ㄷ
+                        cho_ind = 1; jung_ind = 0; jong_ind = 0;
+                    }
+                    else if(!current_state.compare("RD")){
                         w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind));
                         current_word.clear();
-                        cho_ind = 0; jung_ind = 0; jong_ind = 0;
+                        current_word.push_back(3); //ㄷ
+                        cho_ind = 1; jung_ind = 0; jong_ind = 0;
+                    }
+                    else if(!current_state.compare("B1") || !current_state.compare("RB")){
+                        w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind - 1));
+                        current_word.clear();
+                        current_word.push_back(7); //ㅂ
+                        cho_ind = 1; jung_ind = 0; jong_ind = 0;
+                    }
+                    else if(!current_state.compare("G1") || !current_state.compare("NG")){
+                        w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind - 1));
+                        current_word.clear();
+                        current_word.push_back(12); //ㅈ
+                        cho_ind = 1; jung_ind = 0; jong_ind = 0;
+                    }
+                    else if(!current_state.compare("KS") || !current_state.compare("BS")){
+                        w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind - 1));
+                        current_word.clear();
+                        current_word.push_back(9); //ㅅ
+                        cho_ind = 1; jung_ind = 0; jong_ind = 0;
+                    }
+                    else if(!current_state.compare("NS")){
+                        w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind));
+                        current_word.clear();
+                        current_word.push_back(9); //ㅅ
+                        cho_ind = 1; jung_ind = 0; jong_ind = 0;
+                    }
+                    else if(!current_state.compare("RS")){
+                        w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind - 1));
+                        current_word.clear();
+                        current_word.push_back(9); //ㅅ
+                        cho_ind = 1; jung_ind = 0; jong_ind = 0;
                     }
                     else
                         cho_ind ++;
@@ -694,7 +758,7 @@ int main(void){
                 else if(!next_state.compare("A") || !next_state.compare("OH") || !next_state.compare("EU") || !next_state.compare("U")){
                     if(!current_state.compare("K1") || !current_state.compare("N1") || !current_state.compare("R") || !current_state.compare("M1")
                        || !current_state.compare("S1") || !current_state.compare("O1") || !current_state.compare("LL1") || !current_state.compare("D1")
-                       || !current_state.compare("B1") || !current_state.compare("G1") || !current_state.compare("L1")){
+                       || !current_state.compare("B1") || !current_state.compare("G1")){
                         w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, 0));
                         int t = current_word.at(jong_ind);
                         current_word.clear();
@@ -703,7 +767,8 @@ int main(void){
                         cho_ind = 0; jung_ind = 0; jong_ind = 0;
                     }
                     else if(!current_state.compare("KS") || !current_state.compare("NG") || !current_state.compare("RK") || !current_state.compare("RD")
-                            || !current_state.compare("RM") || !current_state.compare("RB") || !current_state.compare("RS") || !current_state.compare("BS")){
+                            || !current_state.compare("RM") || !current_state.compare("RB") || !current_state.compare("RS") || !current_state.compare("BS")
+                            || !current_state.compare("L1")){
                         w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jung_ind + 1));
                         int t = current_word.at(jong_ind);
                         current_word.clear();
@@ -755,7 +820,6 @@ int main(void){
                 }
                 else if(!next_state.compare("K1") || !next_state.compare("N1") || !next_state.compare("R") || !next_state.compare("M1")
                         || !next_state.compare("S1") || !next_state.compare("O1")){
-                    cout << "yesyes" << endl;
                     jong_ind = jung_ind + 1;
                     current_word.push_back(string_conversion(sym.at(0)));
                     
@@ -792,8 +856,12 @@ int main(void){
                     removeLast(w);
                 }
                 else if(!next_state.compare("KS") || !next_state.compare("NG") || !next_state.compare("RK") || !next_state.compare("RD")
-                        || !next_state.compare("RM") || !next_state.compare("RB") || !next_state.compare("RS") || !next_state.compare("BS") || !next_state.compare("L1")){
-                    jong_ind ++;
+                        || !next_state.compare("RM")|| !next_state.compare("RS") || !next_state.compare("BS") || !next_state.compare("RB") || !next_state.compare("L1")){
+                    if(jong_ind == jung_ind + 2){
+                        current_word.pop_back();
+                    }
+                    else
+                        jong_ind ++;
                     temp_word.clear();
                     
                     current_word.push_back(string_conversion(sym.at(0)));
@@ -821,213 +889,512 @@ int main(void){
     }
     
     //초성우선
-    /*else if (type == '2'){
-     while(1)
-     {
-     char value = linux_kbhit();
-     
-     clean();
-     // key stroke detected
-     if (value != -1)
-     {
-     if (value == '<'){
-     //eraser same as 받침우선
-     if (current_word.size() == 0 && wcslen(w) != 0) removeLast(w);
-     else{
-     if (jong_ind == jung_ind + 2){
-     if (current_word.at(jong_ind - 1) == 1)
-     current_state = "K";
-     else if (current_word.at(jong_ind - 1) == 4)
-     current_state = "N";
-     else if (current_word.at(jong_ind - 1) == 8)
-     current_state = "R";
-     else if (current_word.at(jong_ind - 1) == 17)
-     current_state = "B";
-     
-     jong_ind --;
-     }
-     else if (jong_ind == jung_ind + 1){
-     if (jung_ind == cho_ind + 2)
-     current_state = "I";
-     else if (jung_ind == cho_ind + 1){
-     if (current_word.at(jung_ind) == 8)
-     current_state = "O";
-     else if (current_word.at(jung_ind) == 13)
-     current_state = "U";
-     else if (current_word.at(jung_ind) == 18)
-     current_state = "A";
-     else
-     current_state = "I";
-     }
-     jong_ind = 0;
-     }
-     else if (jung_ind == cho_ind + 2){
-     if (current_word.at(jung_ind - 1) == 8)
-     current_state = "O";
-     else if (current_word.at(jung_ind - 1) == 13)
-     current_state = "U";
-     else if (current_word.at(jung_ind - 1) == 18)
-     current_state = "A";
-     jung_ind --;
-     }
-     else if (jung_ind == cho_ind + 1){
-     current_state = "V";
-     jung_ind = 0;
-     }
-     else{
-     current_state = "S";
-     }
-     current_word.pop_back();
-     }
-     if (current_word.size() != 0){
-     temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
-     w = appendwChar(w, temp);
-     wprintf(L"%ls\n", w);
-     removeLast(w);
-     }
-     else
-     wprintf(L"%ls\n", w);
-     continue;
-     }
-     
-     f(current_state, value);
-     next_state = input_table.at(index_i).at(index_j);
-     string sym = output_table.at(index_i).at(index_j);
-     
-     if(!next_state.compare("V")){
-     if(current_state.compare("S"))
-     w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind));
-     current_word.clear();
-     cho_ind = 0;
-     jung_ind = 0;
-     jong_ind = 0;
-     
-     current_word.push_back(string_conversion(sym.at(0)));
-     
-     temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
-     
-     w = appendwChar(w, temp);
-     wprintf(L"%ls\n", w);
-     removeLast(w);
-     }
-     else if(!next_state.compare("O") || !next_state.compare("U") || !next_state.compare("A")){
-     if(!current_state.compare("K") || !current_state.compare("B") || !current_state.compare("N") || !current_state.compare("R")){
-     w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, 0));
-     int t = current_word.at(jong_ind);
-     current_word.clear();
-     current_word.push_back(jong_to_cho(t));
-     
-     cho_ind = 0; jung_ind = 0; jong_ind = 0;
-     }
-     else if (!current_state.compare("L")){
-     if (jong_ind == jung_ind + 2){
-     w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jung_ind + 1));
-     int t = current_word.at(jong_ind);
-     current_word.clear();
-     current_word.push_back(jong_to_single(t));
-     
-     cho_ind = 0; jung_ind = 0; jong_ind = 0;
-     }
-     else{
-     w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, 0));
-     int t = current_word.at(jong_ind);
-     current_word.clear();
-     current_word.push_back(jong_to_cho(t));
-     
-     cho_ind = 0; jung_ind = 0; jong_ind = 0;
-     }
-     }
-     
-     jung_ind = cho_ind + 1;
-     current_word.push_back(string_conversion(sym.at(0)));
-     
-     temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
-     
-     w = appendwChar(w, temp);
-     wprintf(L"%ls\n", w);
-     removeLast(w);
-     }
-     else if(!next_state.compare("I")){
-     if (!current_state.compare("O") || !current_state.compare("U") || !current_state.compare("A"))
-     jung_ind ++;
-     else if (!current_state.compare("V"))
-     jung_ind = cho_ind + 1;
-     else if(!current_state.compare("K") || !current_state.compare("B") || !current_state.compare("N") || !current_state.compare("R")){
-     w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, 0));
-     int t = current_word.at(jong_ind);
-     current_word.clear();
-     current_word.push_back(jong_to_cho(t));
-     
-     cho_ind = 0; jung_ind = 1; jong_ind = 0;
-     }
-     else if (!current_state.compare("L")){
-     if (jong_ind == jung_ind + 2){
-     w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jung_ind + 1));
-     int t = current_word.at(jong_ind);
-     current_word.clear();
-     current_word.push_back(jong_to_single(t));
-     
-     cho_ind = 0; jung_ind = 1; jong_ind = 0;
-     }
-     else{
-     w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, 0));
-     int t = current_word.at(jong_ind);
-     current_word.clear();
-     current_word.push_back(jong_to_cho(t));
-     
-     cho_ind = 0; jung_ind = 1; jong_ind = 0;
-     }
-     }
-     
-     current_word.push_back(string_conversion(sym.at(0)));
-     
-     temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
-     
-     w = appendwChar(w, temp);
-     wprintf(L"%ls\n", w);
-     removeLast(w);
-     }
-     else if(!next_state.compare("K") || !next_state.compare("B") || !next_state.compare("N") || !next_state.compare("R")){
-     jong_ind = jung_ind + 1;
-     current_word.push_back(string_conversion(sym.at(0)));
-     
-     temp = mk_han(current_word, cho_ind, jung_ind, 0);
-     
-     w = appendwChar(w, temp);
-     w = appendwChar(w, 0x1100 + jong_to_cho(current_word.at(jong_ind)));
-     wprintf(L"%ls\n", w);
-     removeLast(w);
-     removeLast(w);
-     }
-     else if(!next_state.compare("L")){
-     if(!current_state.compare("K") || !current_state.compare("B") || !current_state.compare("N") || !current_state.compare("R")){
-     jong_ind ++;
-     current_word.push_back(string_conversion(sym.at(0)));
-     temp = mk_han(current_word, cho_ind, jung_ind, jung_ind + 1);
-     
-     w = appendwChar(w, temp);
-     w = appendwChar(w, 0x1100 + jong_to_cho2(current_word.at(jong_ind)));
-     wprintf(L"%ls\n", w);
-     removeLast(w);
-     removeLast(w);
-     }
-     else{
-     jong_ind = jung_ind + 1;
-     current_word.push_back(string_conversion(sym.at(0)));
-     
-     temp = mk_han(current_word, cho_ind, jung_ind, 0);
-     
-     w = appendwChar(w, temp);
-     w = appendwChar(w, 0x1100 + jong_to_cho(current_word.at(jong_ind)));
-     wprintf(L"%ls\n", w);
-     removeLast(w);
-     removeLast(w);
-     }
-     }
-     current_state = next_state;
-     }
-     }
-     }*/
+    else if (type == '2'){
+        while(1)
+        {
+            char value = linux_kbhit();
+            
+            clean();
+            // key stroke detected
+            if (value != -1)
+            {
+                if (value == '<'){
+                    //eraser
+                    if (current_word.size() == 0 && wcslen(w) != 0) removeLast(w); // no current word
+                    else{
+                        if(temp_word.size() != 0){
+                            if (temp_word.at(0) == 9) //ㄴㅅ
+                                current_state = "N1";
+                            else if (temp_word.at(0) == 2 || temp_word.at(0) == 3) //ㄹㄴ
+                                current_state = "R";
+                            else if (temp_word.at(0) == 11){
+                                if (current_word.at(jong_ind) == 4)
+                                    current_state = "N1";
+                                else if (current_word.at(jong_ind) == 8)
+                                    current_state = "R";
+                            }
+                            temp_word.clear();
+                        }
+                        else if (jong_ind == jung_ind + 2){ //겹받침+쌍자음
+                            if (current_word.at(jong_ind - 1) == 1) //ㄱ
+                                current_state = "K1";
+                            else if (current_word.at(jong_ind - 1) == 4) //ㄴ
+                                current_state = "N1";
+                            else if (current_word.at(jong_ind - 1) == 8) //ㄹ
+                                current_state = "R";
+                            else if (current_word.at(jong_ind - 1) == 17) //ㅂ
+                                current_state = "B1";
+                            else if (current_word.at(jong_ind - 1) == 19) //ㅅ
+                                current_state = "S1";
+                            
+                            jong_ind --;
+                            current_word.pop_back();
+                        }
+                        else if (jong_ind == jung_ind + 1){ //홀받침
+                            int mo = current_word.at(jung_ind);
+                            
+                            switch(mo){
+                                case 0:
+                                    current_state = "A";
+                                    break;
+                                case 1:
+                                    current_state = "UU";
+                                    break;
+                                case 2:
+                                    current_state = "A1";
+                                    break;
+                                case 3:
+                                    current_state = "UU";
+                                    break;
+                                case 4:
+                                    current_state = "E";
+                                    break;
+                                case 5:
+                                    current_state = "UU";
+                                    break;
+                                case 6:
+                                    current_state = "E1";
+                                    break;
+                                case 7:
+                                    current_state = "UU";
+                                    break;
+                                case 8:
+                                    current_state = "OH";
+                                    break;
+                                case 9:
+                                    current_state = "OA";
+                                    break;
+                                case 10:
+                                    current_state = "UUU";
+                                    break;
+                                case 11:
+                                    current_state = "UU";
+                                    break;
+                                case 12:
+                                    current_state = "U";
+                                    break;
+                                case 13:
+                                    current_state = "OO";
+                                    break;
+                                case 14:
+                                    current_state = "OE";
+                                    break;
+                                case 15:
+                                    current_state = "UUU";
+                                    break;
+                                case 16:
+                                    current_state = "UU";
+                                    break;
+                                case 17:
+                                    current_state = "U";
+                                    break;
+                                case 18:
+                                    current_state = "EU";
+                                    break;
+                                case 19:
+                                    current_state = "UU";
+                                    break;
+                                case 20:
+                                    current_state = "U";
+                                    break;
+                            }
+                            jong_ind = 0;
+                            current_word.pop_back();
+                        }
+                        else if (jung_ind == cho_ind + 3){ //3중 모음
+                            if(current_word.at(jung_ind) == 10)
+                                current_state = "OA";
+                            else if(current_word.at(jung_ind) == 15)
+                                current_state = "OE";
+                            
+                            jung_ind --;
+                            current_word.pop_back();
+                        }
+                        else if (jung_ind == cho_ind + 2){ //겹모음
+                            int mo = current_word.at(jung_ind);
+                            
+                            switch(mo){
+                                case 1:
+                                    current_state = "A";
+                                    break;
+                                case 3:
+                                    current_state = "A1";
+                                    break;
+                                case 5:
+                                    current_state = "E";
+                                    break;
+                                case 7:
+                                    current_state = "E1";
+                                    break;
+                                case 9:
+                                    current_state = "OH";
+                                    break;
+                                case 11:
+                                    current_state = "OH";
+                                    break;
+                                case 14:
+                                    current_state = "OO";
+                                    break;
+                                case 16:
+                                    current_state = "OO";
+                                    break;
+                                case 19:
+                                    current_state = "EU";
+                                    break;
+                            }
+                            
+                            jung_ind --;
+                            current_word.pop_back();
+                        }
+                        else if (jung_ind == cho_ind + 1){ //홀모음
+                            int cho = current_word.at(cho_ind);
+                            
+                            switch(cho){
+                                case 0:
+                                    current_state = "K";
+                                    break;
+                                case 1:
+                                    current_state = "LL";
+                                    break;
+                                case 2:
+                                    current_state = "N";
+                                    break;
+                                case 3:
+                                    current_state = "D";
+                                    break;
+                                case 4:
+                                    current_state = "LL";
+                                    break;
+                                case 5:
+                                    current_state = "L";
+                                    break;
+                                case 6:
+                                    current_state = "M";
+                                    break;
+                                case 7:
+                                    current_state = "B";
+                                    break;
+                                case 8:
+                                    current_state = "LL";
+                                    break;
+                                case 9:
+                                    current_state = "S";
+                                    break;
+                                case 10:
+                                    current_state = "LL";
+                                    break;
+                                case 11:
+                                    current_state = "O";
+                                    break;
+                                case 12:
+                                    current_state = "G";
+                                    break;
+                                case 13:
+                                    current_state = "LL";
+                                    break;
+                                case 14:
+                                    current_state = "L";
+                                    break;
+                                case 15:
+                                    current_state = "L";
+                                    break;
+                                case 16:
+                                    current_state = "L";
+                                    break;
+                                case 17:
+                                    current_state = "L";
+                                    break;
+                                case 18:
+                                    current_state = "L";
+                                    break;
+                            }
+                            
+                            jung_ind = 0;
+                            current_word.pop_back();
+                        }
+                        else if(cho_ind == 1){
+                            int cho = current_word.at(0);
+                            switch(cho){
+                                case 0:
+                                    current_state = "K";
+                                    break;
+                                case 2:
+                                    current_state = "N";
+                                    break;
+                                case 3:
+                                    current_state = "D";
+                                    break;
+                                case 6:
+                                    current_state = "M";
+                                    break;
+                                case 7:
+                                    current_state = "B";
+                                    break;
+                                case 9:
+                                    current_state = "S";
+                                    break;
+                                case 11:
+                                    current_state = "O";
+                                    break;
+                                case 12:
+                                    current_state = "G";
+                                    break;
+                            }
+                            
+                            cho_ind --;
+                            current_word.pop_back();
+                        }
+                        else{
+                            current_state = "ST";
+                            current_word.pop_back();
+                        }
+                    }
+                    if (jong_ind == jung_ind + 1){
+                        temp = mk_han(current_word, cho_ind, jung_ind, 0);
+                        
+                        w = appendwChar(w, temp);
+                        w = appendwChar(w, 0x1100 + jong_to_cho(current_word.at(jong_ind)));
+                        wprintf(L"%ls\n", w);
+                        removeLast(w);
+                        removeLast(w);
+                    }
+                    else if (current_word.size() != 0){ //초성
+                        temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
+                        w = appendwChar(w, temp);
+                        wprintf(L"%ls\n", w);
+                        removeLast(w);
+                    }
+                    else
+                        wprintf(L"%ls\n", w);
+                    continue;
+                }
+                
+                f(current_state, value); // current state, input symbol => next state
+                next_state = input_table.at(index_i).at(index_j); // next state
+                string sym = output_table.at(index_i).at(index_j); // output symbol
+                
+                if(!next_state.compare("K") || !next_state.compare("N") || !next_state.compare("M") || !next_state.compare("S") || !next_state.compare("O")){ // chosung
+                    if(current_state.compare("ST")) // start of the program
+                        w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind));
+                    current_word.clear();
+                    cho_ind = 0;
+                    jung_ind = 0;
+                    jong_ind = 0;
+                    
+                    current_word.push_back(string_conversion(sym.at(0)));
+                    
+                    
+                    temp = mk_han(current_word, cho_ind, jung_ind, jong_ind); // last character
+                    
+                    //print and erase
+                    w = appendwChar(w, temp);
+                    wprintf(L"%ls\n", w);
+                    removeLast(w);
+                }
+                else if(!next_state.compare("D") || !next_state.compare("B") || !next_state.compare("G")){
+                    if(!current_state.compare("KS") || !current_state.compare("RS") || !current_state.compare("BS")){
+                        current_word.pop_back();
+                        jong_ind --;
+                        w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind));
+                        
+                        current_word.clear();
+                        cho_ind = 0; jung_ind = 0; jong_ind = 0;
+                    }
+                    else{
+                        current_word.pop_back();
+                    }
+                    current_word.push_back(string_conversion(sym.at(0)));
+                    
+                    temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
+                    
+                    w = appendwChar(w, temp);
+                    wprintf(L"%ls\n", w);
+                    removeLast(w);
+                }
+                else if(!next_state.compare("L")){
+                    if(!current_state.compare("K1") || !current_state.compare("N1") || !current_state.compare("R") || !current_state.compare("M1")
+                       || !current_state.compare("S1") || !current_state.compare("O1")
+                       || !current_state.compare("RK") || !current_state.compare("D1") || !current_state.compare("B1") || !current_state.compare("G1")
+                       || !current_state.compare("RD") || !current_state.compare("RB") || !current_state.compare("KS")
+                       || !current_state.compare("BS")){
+                        w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind));
+                        current_word.clear();
+                        cho_ind = 0; jung_ind = 0; jong_ind = 0;
+                    }
+                    else if(!current_state.compare("NG")){
+                        w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind - 1));
+                        current_word.clear();
+                        cho_ind = 0; jung_ind = 0; jong_ind = 0;
+                    }
+                    else if(current_word.size() != 0)
+                        current_word.pop_back();
+                    current_word.push_back(string_conversion(sym.at(0)));
+                    
+                    temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
+                    
+                    w = appendwChar(w, temp);
+                    wprintf(L"%ls\n", w);
+                    removeLast(w);
+                }
+                else if(!next_state.compare("LL")){
+                    if(!current_state.compare("RK") || !current_state.compare("D1") || !current_state.compare("B1") || !current_state.compare("G1")
+                       || !current_state.compare("RD") || !current_state.compare("RB") || !current_state.compare("KS") || !current_state.compare("NG")
+                       || !current_state.compare("BS")){
+                        w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind - 1));
+                        current_word.clear();
+                        cho_ind = 0; jung_ind = 0; jong_ind = 0;
+                    }
+                    else if(!current_state.compare("NS") || !current_state.compare("RS")){
+                        w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind));
+                        current_word.clear();
+                        cho_ind = 0; jung_ind = 0; jong_ind = 0;
+                    }
+                    else
+                        cho_ind ++;
+                    
+                    current_word.push_back(string_conversion(sym.at(0)));
+                    
+                    temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
+                    
+                    w = appendwChar(w, temp);
+                    wprintf(L"%ls\n", w);
+                    removeLast(w);
+                }
+                else if(!next_state.compare("A") || !next_state.compare("OH") || !next_state.compare("EU") || !next_state.compare("U")){
+                    if(!current_state.compare("K1") || !current_state.compare("N1") || !current_state.compare("R") || !current_state.compare("M1")
+                       || !current_state.compare("S1") || !current_state.compare("O1") || !current_state.compare("LL1") || !current_state.compare("D1")
+                       || !current_state.compare("B1") || !current_state.compare("G1")){
+                        w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, 0));
+                        int t = current_word.at(jong_ind);
+                        current_word.clear();
+                        current_word.push_back(jong_to_cho(t));
+                        
+                        cho_ind = 0; jung_ind = 0; jong_ind = 0;
+                    }
+                    else if(!current_state.compare("KS") || !current_state.compare("NG") || !current_state.compare("RK") || !current_state.compare("RD")
+                            || !current_state.compare("RM") || !current_state.compare("RB") || !current_state.compare("RS") || !current_state.compare("BS")
+                            || !current_state.compare("L1")){
+                        w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jung_ind + 1));
+                        int t = current_word.at(jong_ind);
+                        current_word.clear();
+                        current_word.push_back(jong_to_single(t));
+                        
+                        cho_ind = 0; jung_ind = 0; jong_ind = 0;
+                    }
+                    else if((!current_state.compare("NS") || !current_state.compare("NO") || !current_state.compare("RO")) && temp_word.size() != 0){
+                        w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind));
+                        current_word.clear();
+                        
+                        cho_ind = 0; jung_ind = 0; jong_ind = 0;
+                        current_word.push_back(temp_word.at(0));
+                        temp_word.clear();
+                    }
+                    else if(!current_state.compare("OH") || !current_state.compare("OO")){
+                        current_word.pop_back();
+                        //current_word.push_back(string_conversion(sym.at(0)));
+                    }
+                    
+                    jung_ind = cho_ind + 1;
+                    current_word.push_back(string_conversion(sym.at(0)));
+                    
+                    temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
+                    
+                    w = appendwChar(w, temp);
+                    wprintf(L"%ls\n", w);
+                    removeLast(w);
+                }
+                else if(!next_state.compare("A1") || !next_state.compare("E") || !next_state.compare("E1") || !next_state.compare("OO")){ //홑모음
+                    current_word.pop_back();
+                    current_word.push_back(string_conversion(sym.at(0)));
+                    
+                    temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
+                    
+                    w = appendwChar(w, temp);
+                    wprintf(L"%ls\n", w);
+                    removeLast(w);
+                }
+                else if(!next_state.compare("OA") || !next_state.compare("OE") || !next_state.compare("UU") || !next_state.compare("UUU")){
+                    jung_ind ++;
+                    current_word.push_back(string_conversion(sym.at(0)));
+                    
+                    temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
+                    
+                    w = appendwChar(w, temp);
+                    wprintf(L"%ls\n", w);
+                    removeLast(w);
+                }
+                else if(!next_state.compare("K1") || !next_state.compare("N1") || !next_state.compare("R") || !next_state.compare("M1")
+                        || !next_state.compare("S1") || !next_state.compare("O1")){
+                    jong_ind = jung_ind + 1;
+                    current_word.push_back(string_conversion(sym.at(0)));
+                    
+                    temp = mk_han(current_word, cho_ind, jung_ind, 0);
+                    
+                    w = appendwChar(w, temp);
+                    w = appendwChar(w, 0x1100 + jong_to_cho(current_word.at(jong_ind)));
+                    wprintf(L"%ls\n", w);
+                    removeLast(w);
+                    removeLast(w);
+                }
+                else if(!next_state.compare("NS") || !next_state.compare("NO") || !next_state.compare("RN") || !next_state.compare("RO")){
+                    int next_cho = string_conversion(sym.at(0));
+                    temp_word.push_back(next_cho);
+                    
+                    temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
+                    
+                    w = appendwChar(w, temp);
+                    w = appendwChar(w, mk_han(temp_word, 0, 0, 0));
+                    wprintf(L"%ls\n", w);
+                    removeLast(w);
+                    removeLast(w);
+                }
+                else if(!next_state.compare("RD")){
+                    temp_word.pop_back();
+                    
+                    int next_cho = string_conversion(sym.at(0));
+                    temp_word.push_back(next_cho);
+                    
+                    temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
+                    
+                    w = appendwChar(w, temp);
+                    w = appendwChar(w, mk_han(temp_word, 0, 0, 0));
+                    wprintf(L"%ls\n", w);
+                    removeLast(w);
+                    removeLast(w);
+                }
+                else if(!next_state.compare("KS") || !next_state.compare("NG") || !next_state.compare("RK") || !next_state.compare("RD")
+                        || !next_state.compare("RM")|| !next_state.compare("RS") || !next_state.compare("BS") || !next_state.compare("RB") || !next_state.compare("L1")){
+                    if(jong_ind == jung_ind + 2){
+                        current_word.pop_back();
+                    }
+                    else
+                        jong_ind ++;
+                    temp_word.clear();
+                    
+                    current_word.push_back(string_conversion(sym.at(0)));
+                    
+                    temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
+                    
+                    w = appendwChar(w, temp);
+                    wprintf(L"%ls\n", w);
+                    removeLast(w);
+                }
+                else if(!next_state.compare("D1") || !next_state.compare("B1") || !next_state.compare("G1") || !next_state.compare("LL1")){
+                    current_word.pop_back();
+                    current_word.push_back(string_conversion(sym.at(0)));
+                    
+                    temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
+                    
+                    w = appendwChar(w, temp);
+                    wprintf(L"%ls\n", w);
+                    removeLast(w);
+                }
+                
+                current_state = next_state;
+            }
+        }
+    }
+    
     
     printf("\n");
     printf("Bye bye\n\n");
