@@ -260,6 +260,8 @@ int jong_to_cho(int jong){
 // match double jongsung unicode to single chosung unicode
 int jong_to_single(int jong){
     switch(jong){
+        case 2 :
+            return 1;
         case 3 :
             return 9;
         case 5 :
@@ -282,6 +284,8 @@ int jong_to_single(int jong){
             return 18;
         case 18 :
             return 9;
+        case 20 :
+            return 10;
         default :
             return -1;
     }
@@ -735,6 +739,7 @@ int main(void){
                     else if(!current_state.compare("NS")){
                         w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind));
                         current_word.clear();
+                        temp_word.clear();
                         current_word.push_back(9); //ㅅ
                         cho_ind = 1; jung_ind = 0; jong_ind = 0;
                     }
@@ -769,12 +774,27 @@ int main(void){
                     else if(!current_state.compare("KS") || !current_state.compare("NG") || !current_state.compare("RK") || !current_state.compare("RD")
                             || !current_state.compare("RM") || !current_state.compare("RB") || !current_state.compare("RS") || !current_state.compare("BS")
                             || !current_state.compare("L1")){
-                        w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jung_ind + 1));
+                        if(current_word.at(jong_ind) == 2){
+                            w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, 0));
+                            current_word.clear();
+                            current_word.push_back(0); //ㄱ
+                            cho_ind = 1;
+                        }
+                        else if(current_word.at(jong_ind) == 20){
+                            w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, 0));
+                            current_word.clear();
+                            current_word.push_back(9); //ㅅ
+                            cho_ind = 1;
+                        }
+                        else{
+                            w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jung_ind + 1));
+                            cho_ind = 0;
+                            current_word.clear();
+                        }
                         int t = current_word.at(jong_ind);
-                        current_word.clear();
                         current_word.push_back(jong_to_single(t));
                         
-                        cho_ind = 0; jung_ind = 0; jong_ind = 0;
+                        jong_ind = 0;
                     }
                     else if((!current_state.compare("NS") || !current_state.compare("NO") || !current_state.compare("RO")) && temp_word.size() != 0){
                         w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind));
@@ -1237,17 +1257,54 @@ int main(void){
                     removeLast(w);
                 }
                 else if(!next_state.compare("LL")){
-                    if(!current_state.compare("RK") || !current_state.compare("D1") || !current_state.compare("B1") || !current_state.compare("G1")
-                       || !current_state.compare("RD") || !current_state.compare("RB") || !current_state.compare("KS") || !current_state.compare("NG")
-                       || !current_state.compare("BS")){
+                    if(!current_state.compare("RK")){
                         w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind - 1));
                         current_word.clear();
-                        cho_ind = 0; jung_ind = 0; jong_ind = 0;
+                        current_word.push_back(0); //ㄱ
+                        cho_ind = 1; jung_ind = 0; jong_ind = 0;
                     }
-                    else if(!current_state.compare("NS") || !current_state.compare("RS")){
+                    else if(!current_state.compare("D1")){
+                        w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, 0));
+                        current_word.clear();
+                        current_word.push_back(3); //ㄷ
+                        cho_ind = 1; jung_ind = 0; jong_ind = 0;
+                    }
+                    else if(!current_state.compare("RD")){
                         w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind));
                         current_word.clear();
-                        cho_ind = 0; jung_ind = 0; jong_ind = 0;
+                        current_word.push_back(3); //ㄷ
+                        cho_ind = 1; jung_ind = 0; jong_ind = 0;
+                    }
+                    else if(!current_state.compare("B1") || !current_state.compare("RB")){
+                        w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind - 1));
+                        current_word.clear();
+                        current_word.push_back(7); //ㅂ
+                        cho_ind = 1; jung_ind = 0; jong_ind = 0;
+                    }
+                    else if(!current_state.compare("G1") || !current_state.compare("NG")){
+                        w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind - 1));
+                        current_word.clear();
+                        current_word.push_back(12); //ㅈ
+                        cho_ind = 1; jung_ind = 0; jong_ind = 0;
+                    }
+                    else if(!current_state.compare("KS") || !current_state.compare("BS")){
+                        w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind - 1));
+                        current_word.clear();
+                        current_word.push_back(9); //ㅅ
+                        cho_ind = 1; jung_ind = 0; jong_ind = 0;
+                    }
+                    else if(!current_state.compare("NS")){
+                        w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind));
+                        current_word.clear();
+                        temp_word.clear();
+                        current_word.push_back(9); //ㅅ
+                        cho_ind = 1; jung_ind = 0; jong_ind = 0;
+                    }
+                    else if(!current_state.compare("RS")){
+                        w = appendwChar(w, mk_han(current_word, cho_ind, jung_ind, jong_ind - 1));
+                        current_word.clear();
+                        current_word.push_back(9); //ㅅ
+                        cho_ind = 1; jung_ind = 0; jong_ind = 0;
                     }
                     else
                         cho_ind ++;
@@ -1363,7 +1420,7 @@ int main(void){
                     removeLast(w);
                 }
                 else if(!next_state.compare("KS") || !next_state.compare("NG") || !next_state.compare("RK") || !next_state.compare("RD")
-                        || !next_state.compare("RM")|| !next_state.compare("RS") || !next_state.compare("BS") || !next_state.compare("RB") || !next_state.compare("L1")){
+                        || !next_state.compare("RM")|| !next_state.compare("RS") || !next_state.compare("BS") || !next_state.compare("RB")){
                     if(jong_ind == jung_ind + 2){
                         current_word.pop_back();
                     }
@@ -1373,20 +1430,59 @@ int main(void){
                     
                     current_word.push_back(string_conversion(sym.at(0)));
                     
-                    temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
+                    temp = mk_han(current_word, cho_ind, jung_ind, jong_ind - 1);
                     
                     w = appendwChar(w, temp);
+                    w = appendwChar(w, 0x1100 + jong_to_cho2(current_word.at(jong_ind)));
                     wprintf(L"%ls\n", w);
                     removeLast(w);
+                    removeLast(w);
+                }
+                else if(!next_state.compare("L1")){
+                    if(string_conversion(sym.at(0)) == 2 || string_conversion(sym.at(0)) == 20){
+                        jong_ind ++;
+                        
+                        temp_word.clear();
+                        
+                        current_word.push_back(string_conversion(sym.at(0)));
+                        
+                        temp = mk_han(current_word, cho_ind, jung_ind, 0);
+                        
+                        w = appendwChar(w, temp);
+                        w = appendwChar(w, 0x1100 + jong_to_cho(current_word.at(jong_ind)));
+                        wprintf(L"%ls\n", w);
+                        removeLast(w);
+                        removeLast(w);
+                    }
+                    else{
+                        if(jong_ind == jung_ind + 2){
+                            current_word.pop_back();
+                        }
+                        else
+                            jong_ind ++;
+                        temp_word.clear();
+                        
+                        current_word.push_back(string_conversion(sym.at(0)));
+                        
+                        temp = mk_han(current_word, cho_ind, jung_ind, jong_ind - 1);
+                        
+                        w = appendwChar(w, temp);
+                        w = appendwChar(w, 0x1100 + jong_to_cho2(current_word.at(jong_ind)));
+                        wprintf(L"%ls\n", w);
+                        removeLast(w);
+                        removeLast(w);
+                    }
                 }
                 else if(!next_state.compare("D1") || !next_state.compare("B1") || !next_state.compare("G1") || !next_state.compare("LL1")){
                     current_word.pop_back();
                     current_word.push_back(string_conversion(sym.at(0)));
                     
-                    temp = mk_han(current_word, cho_ind, jung_ind, jong_ind);
+                    temp = mk_han(current_word, cho_ind, jung_ind, 0);
                     
                     w = appendwChar(w, temp);
+                    w = appendwChar(w, 0x1100 + jong_to_cho(current_word.at(jong_ind)));
                     wprintf(L"%ls\n", w);
+                    removeLast(w);
                     removeLast(w);
                 }
                 
